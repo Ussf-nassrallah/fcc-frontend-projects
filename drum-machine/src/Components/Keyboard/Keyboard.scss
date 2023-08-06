@@ -1,0 +1,13 @@
+.keyboard {
+    background-color: #17594A;
+    color: #fff;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    min-width: 700px;
+    min-height: 500px;
+    border-radius: 6px;
+}

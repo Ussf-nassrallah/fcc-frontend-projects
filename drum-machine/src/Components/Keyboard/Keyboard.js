@@ -1,8 +1,23 @@
 import React from 'react'
+import "./Keyboard.scss"
 
-const Keyboard = () => {
+const Keyboard = ({firstSoundsGroup, play}) => {
   return (
-    <div>Keyboard</div>
+    firstSoundsGroup.map(sound => {
+        return <button
+            key={sound.key}
+            className='drum-pad'
+            onClick={() => play(sound.key)}
+        >
+            {sound.key}
+            <audio
+                className='clip'
+                id={sound.key}
+                src={sound.url}
+            >
+            </audio>
+        </button>
+    })
   )
 }
 
