@@ -1,158 +1,96 @@
 import React, { useState } from 'react';
-import Keyboard from './Components/Keyboard/Keyboard';
-import Navbar from './Components/Navbar/Navbar';
-import './App.scss';
+import { l } from './soundsData';
 
-const firstSoundsGroup = [
-  {
-    keyCode: 81,
-    key: 'Q',
-    id: 'Heater-1',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3'
-  },
-  {
-    keyCode: 87,
-    key: 'W',
-    id: 'Heater-2',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3'
-  },
-  {
-    keyCode: 69,
-    key: 'E',
-    id: 'Heater-3',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3'
-  },
-  {
-    keyCode: 65,
-    key: 'A',
-    id: 'Heater-4',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3'
-  },
-  {
-    keyCode: 83,
-    key: 'S',
-    id: 'Clap',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-6.mp3'
-  },
-  {
-    keyCode: 68,
-    key: 'D',
-    id: 'Open-HH',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Dsc_Oh.mp3'
-  },
-  {
-    keyCode: 90,
-    key: 'Z',
-    id: "Kick-n'-Hat",
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3'
-  },
-  {
-    keyCode: 88,
-    key: 'X',
-    id: 'Kick',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3'
-  },
-  {
-    keyCode: 67,
-    key: 'C',
-    id: 'Closed-HH',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Cev_H2.mp3'
-  }
-];
-const secondSoundsGroup = [
-  {
-    keyCode: 81,
-    key: 'Q',
-    id: 'Chord-1',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3'
-  },
-  {
-    keyCode: 87,
-    key: 'W',
-    id: 'Chord-2',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_2.mp3'
-  },
-  {
-    keyCode: 69,
-    key: 'E',
-    id: 'Chord-3',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_3.mp3'
-  },
-  {
-    keyCode: 65,
-    key: 'A',
-    id: 'Shaker',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Give_us_a_light.mp3'
-  },
-  {
-    keyCode: 83,
-    key: 'S',
-    id: 'Open-HH',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Dry_Ohh.mp3'
-  },
-  {
-    keyCode: 68,
-    key: 'D',
-    id: 'Closed-HH',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Bld_H1.mp3'
-  },
-  {
-    keyCode: 90,
-    key: 'Z',
-    id: 'Punchy-Kick',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/punchy_kick_1.mp3'
-  },
-  {
-    keyCode: 88,
-    key: 'X',
-    id: 'Side-Stick',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/side_stick_1.mp3'
-  },
-  {
-    keyCode: 67,
-    key: 'C',
-    id: 'Snare',
-    url: 'https://s3.amazonaws.com/freecodecamp/drums/Brk_Snr.mp3'
-  }
-];
+const Key = ({ clip, volume, setRec }) => {
+  const [active, setActive] = useState(false);
 
-function KeyboardKey(sound, playSound) {
+  const handleKeyPress = (e) => {
+    if (e.keyCode === clip.keyCode) {
+      playSound();
+    }
+  }
+
+  React.useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, []);
+
+  const playSound = () => {
+    const audioTag = document.getElementById(clip.keyTrigger);
+    setActive(true);
+    setTimeout(() => setActive(false), 200);
+    audioTag.volume = volume;
+    audioTag.currentTime = 0;
+    audioTag.play();
+    setRec((prev) => prev + clip.keyTrigger + " ");
+  }
+
   return (
-    <button
-      key={sound.key}
-      className='drum-pad'
-      onClick={() => playSound(sound.key)}
-    >
-      {sound.key}
-      <audio
-        className='clip'
-        id={sound.key}
-        src={sound.url}
-      >
-      </audio>
-    </button>
+    <div onClick={playSound} className={`btn btn-secondary p-4 m-3 ${active && "btn-warning"} drum-pad`} id={clip.id}>
+      <audio className='clip' id={clip.keyTrigger} src={clip.url} />
+      {clip.keyTrigger}
+    </div>
   )
 }
 
-function App() {
-  function playSound(key) {
-    const audio = document.getElementById(key);
-    audio.play();
+const App = () => {
+  const [volume, setVolume] = useState(1);
+  const [speed, setSpeed] = useState(0.5);
+  const [rec, setRec] = useState("");
+
+  const playRec = () => {
+    let index = 0;
+    let recArray = rec.split(" ");
+    const interval = setInterval(() => {
+      const audioTag = document.getElementById(recArray[index]);
+      audioTag.volume = volume;
+      audioTag.currentTime = 0;
+      audioTag.play();
+      index++;
+    }, speed * 600);
+    setTimeout(() => clearInterval(interval), speed * 600 * recArray.length - 1);
   }
 
   return (
-    <div className="App">
-      <Navbar />
-
-      <div id="drum-machine">
-        <div id='display'></div>
-        <Keyboard
-          firstSoundsGroup={firstSoundsGroup}
-          KeyboardKey={KeyboardKey}
+    <div className='bg-info min-vh-100 text-white' id="drum-machine">
+      <div className='text-center' id="display">
+        <h2 className='py-3'>Drum Machine</h2>
+        { l.map((clip) => (
+          <Key key={clip.id} clip={clip} volume={volume} setRec={setRec} />
+        ))}
+        <br />
+        <h4>Volume</h4>
+        <input
+          type='range'
+          step='0.01'
+          value={volume}
+          max='1'
+          min='0'
+          className='w-50'
+          onChange={(e) => setVolume(e.target.value)}
         />
+        <p>{rec}</p>
+        {rec && (
+          <>
+            <div>
+            <button onClick={playRec} className='btn btn-success'>Play</button>
+            <button onClick={() => setRec("")} className='btn btn-danger'>Clear</button>
+            </div>
+            <h4>Speed</h4>
+            <input
+              type='range'
+              step='0.01'
+              value={speed}
+              max='1.2'
+              min='0.1'
+              className='w-50'
+              onChange={(e) => setSpeed(e.target.value)}
+            />
+          </>
+        )}
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
