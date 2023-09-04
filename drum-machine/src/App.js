@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { l } from './soundsData';
+import "./App.scss";
 
 const Key = ({ clip, volume, setRec }) => {
   const [active, setActive] = useState(false);
@@ -26,7 +27,7 @@ const Key = ({ clip, volume, setRec }) => {
   }
 
   return (
-    <div onClick={playSound} className={`btn btn-secondary p-4 m-3 ${active && "btn-warning"} drum-pad`} id={clip.id}>
+    <div onClick={playSound} className={`btn btn-secondary m-3 ${active && "btn-warning"} drum-pad`} id={clip.id}>
       <audio className='clip' id={clip.keyTrigger} src={clip.url} />
       {clip.keyTrigger}
     </div>
@@ -52,42 +53,58 @@ const App = () => {
   }
 
   return (
-    <div className='bg-info min-vh-100 text-white' id="drum-machine">
-      <div className='text-center' id="display">
-        <h2 className='py-3'>Drum Machine</h2>
-        { l.map((clip) => (
-          <Key key={clip.id} clip={clip} volume={volume} setRec={setRec} />
-        ))}
-        <br />
-        <h4>Volume</h4>
-        <input
-          type='range'
-          step='0.01'
-          value={volume}
-          max='1'
-          min='0'
-          className='w-50'
-          onChange={(e) => setVolume(e.target.value)}
-        />
-        <p>{rec}</p>
-        {rec && (
-          <>
-            <div>
-            <button onClick={playRec} className='btn btn-success'>Play</button>
-            <button onClick={() => setRec("")} className='btn btn-danger'>Clear</button>
-            </div>
-            <h4>Speed</h4>
+    <div className='bg-dark min-vh-100 text-white' id="drum-machine">
+      <div className='text-center container-fluid' id="display">
+        <div>
+          <h2 className='py-3'>Drum Machine</h2>
+          <div className='grid'>
+            { l.map((clip) => (
+                <Key key={clip.id} clip={clip} volume={volume} setRec={setRec} />
+            ))}
+          </div>
+        </div>
+        
+        <div className='controller'>
+          <div className='controller__volume'>
+            <h4>Volume</h4>
             <input
               type='range'
               step='0.01'
-              value={speed}
-              max='1.2'
-              min='0.1'
+              value={volume}
+              max='1'
+              min='0'
               className='w-50'
-              onChange={(e) => setSpeed(e.target.value)}
+              onChange={(e) => setVolume(e.target.value)}
             />
-          </>
-        )}
+          </div>
+
+          <div className='controller__sound'>
+            <p className='sound_output'>#{rec}</p>
+            { rec && (
+              <div>
+                <button onClick={playRec} className='btn btn-success m-2'>Play</button>
+                <button onClick={() => setRec("")} className='btn btn-danger m-2'>Clear</button>
+              </div>
+            )}
+          </div>
+
+          <div className='controller__speed'>
+            {rec && (
+              <>
+                <h4>Speed</h4>
+                <input
+                  type='range'
+                  step='0.01'
+                  value={speed}
+                  max='1.2'
+                  min='0.1'
+                  className='w-50'
+                  onChange={(e) => setSpeed(e.target.value)}
+                />
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
